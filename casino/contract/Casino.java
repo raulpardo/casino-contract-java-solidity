@@ -686,14 +686,14 @@ public final class Casino extends Address {
 		//@ set abortCase = false;
 		this.updateBlockchainVariables(_msg,_block,_tx);
 		try {
-			// JCSystem.beginTransaction();
+			JCSystem.beginTransaction();
 			this.closeCasino();
-			// JCSystem.commitTransaction();
+			JCSystem.commitTransaction();
 			//commitTr
 		} catch (Exception e) {
 			//@ set abortCase = true;
 			//abortTr
-			// JCSystem.abortTransaction();
+			JCSystem.abortTransaction();
 			//System.out.println(e);
 		}
 	}
