@@ -12,7 +12,7 @@ import javacard.framework.JCSystem;
 public final class Casino extends Address {
 
 	private static final Exception REQUIRES_FAILED = new Exception();
-	
+
 	// == INVARIANTS ==
 
 	// ** Gordon syntax **
@@ -186,7 +186,7 @@ public final class Casino extends Address {
 		this.require(msg.sender.eq(operator));
 	}
 
-	/*@ 
+	/*@
 	  @ public normal_behavior
 	  @ requires<heap><savedHeap> state == State.IDLE || state == State.GAME_AVAILABLE;
 	  @ ensures<heap><savedHeap> true;
@@ -678,22 +678,22 @@ public final class Casino extends Address {
 	  @ ensures !abortCase ==> (operator.balance._value == \old(operator.balance.sum(this.balance)._value));
 	  @ ensures !abortCase ==> (this.balance._value == 0);
 	  @ ensures !abortCase ==> destroyed;
-	  @ ensures abortCase ==> (\old(balance) == balance && 
-	  @                        \old(operator.balance) == operator.balance && 
-	  @                        \old(destroyed) == destroyed);	  
+	  @ ensures abortCase ==> (\old(balance) == balance &&
+	  @                        \old(operator.balance) == operator.balance &&
+	  @                        \old(destroyed) == destroyed);
 	  @*/
 	public void call_closeCasino(Message _msg, Block _block, Transaction _tx) throws Exception {
 		//@ set abortCase = false;
 		this.updateBlockchainVariables(_msg,_block,_tx);
 		try {
-			JCSystem.beginTransaction();
+			// JCSystem.beginTransaction();
 			this.closeCasino();
-			JCSystem.commitTransaction();
+			// JCSystem.commitTransaction();
 			//commitTr
 		} catch (Exception e) {
 			//@ set abortCase = true;
 			//abortTr
-			JCSystem.abortTransaction();
+			// JCSystem.abortTransaction();
 			//System.out.println(e);
 		}
 	}
@@ -705,7 +705,7 @@ public final class Casino extends Address {
 	  @ ensures operator.balance._value == \old(operator.balance.sum(this.balance)._value);
 	  @ ensures this.balance._value == 0;
 	  @ ensures destroyed;
-	  @ signals (Exception e) true; 
+	  @ signals (Exception e) true;
 	  @
 	  @ also
 	  @
