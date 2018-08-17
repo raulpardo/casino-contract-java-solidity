@@ -6,15 +6,14 @@ public class Address {
 
   //@ public model \locset footprint;
   
-   //@ public accessible footprint: footprint;
-
+  //@ public accessible footprint: footprint;
   //@ public accessible \inv: footprint;
- 
+	 
   //@ private represents footprint = \set_union(this.*, this.address[*]);
 
- //@ public invariant (\forall Address a; a.address.length == this.address.length);
- //@ public invariant (\forall Address a; a.address == this.address; a == this);
- public final byte[] address;
+  //@ private invariant (\forall Address a; a.address.length == this.address.length);
+  //@ private invariant (\forall Address a; a.address == this.address; a == this);
+  public final byte[] address;
 
   //@ public invariant \invariant_for(balance);
   public Uint256 balance;
@@ -26,26 +25,32 @@ public class Address {
   }
 
   /*@ public normal_behavior
-    @ requires price._value <= this.balance._value;
-    @ requires sender != this;
-    @ ensures this.balance._value == \old(this.balance.sum(price)._value);
-    @ ensures sender.balance._value == \old(sender.balance.sub(price)._value);
+    @ requires \invariant_for(price) && \invariant_for(sender);
+    @ requires price.leq(this.balance);
+    @ requires !sender.eq(this);
+    @ ensures this.balance.eq(\old(this.balance.sum(price)));
+    @ ensures sender.balance.eq(\old(sender.balance.sub(price)));
     @ assignable this.balance, sender.balance;
+    @ assignable<savedHeap> \strictly_nothing;
     @
     @ also
     @
-	@ public normal_behavior
-    @ requires price._value <= this.balance._value;
-    @ requires sender == this;
-    @ ensures this.balance._value == \old(this.balance._value);
+    @ public normal_behavior
+    @ requires \invariant_for(price) && \invariant_for(sender);
+    @ requires price.leq(this.balance);
+    @ requires sender.eq(this);
+    @ ensures this.balance.leq(\old(this.balance));
     @ assignable this.balance;
+    @ assignable<savedHeap> \strictly_nothing;
     @
     @ also
     @
     @ public exceptional_behavior
-    @ requires price._value > this.balance._value;
+    @ requires \invariant_for(price);
+    @ requires price.gr(this.balance);
     @ signals (Exception) true;
     @ assignable \nothing;
+    @ assignable<savedHeap> \strictly_nothing;
     @*/
   public void transfer(Address sender, Uint256 price) throws Exception {
     // NOTE(raul): This function should be executed by the receiver of the money
@@ -72,30 +77,33 @@ public class Address {
 
   /*@ public normal_behavior
     @ requires \invariant_for(price) && \invariant_for(sender);
-    @ requires price._value <= this.balance._value;
-    @ requires sender != this;
-    @ ensures this.balance._value == \old(this.balance.sum(price)._value);
-    @ ensures sender.balance._value == \old(sender.balance.sub(price)._value);
+    @ requires price.leq(this.balance);
+    @ requires sender.eq(this);
+    @ ensures this.balance.eq(\old(this.balance.sum(price)));
+    @ ensures sender.balance.eq(\old(sender.balance.sub(price)));
     @ ensures \result;
     @ assignable this.balance, sender.balance;
-    @
-    @ also
-    @
-	@ public normal_behavior
-    @ requires \invariant_for(price) && \invariant_for(sender);
-    @ requires price._value <= this.balance._value;
-    @ requires sender == this;
-    @ ensures this.balance._value == \old(this.balance._value);
-    @ ensures \result;
-    @ assignable this.balance;
+    @ assignable<savedHeap> \nothing;
     @
     @ also
     @
     @ public normal_behavior
     @ requires \invariant_for(price) && \invariant_for(sender);
-    @ requires price._value > this.balance._value;
+    @ requires price.leq(this.balance);
+    @ requires !sender.eq(this);
+    @ ensures this.balance.eq(\old(this.balance));
+    @ ensures \result;
+    @ assignable this.balance;
+    @ assignable<savedHeap> \nothing;
+    @
+    @ also
+    @
+    @ public normal_behavior
+    @ requires \invariant_for(price) && \invariant_for(sender);
+    @ requires price.gr(this.balance);
     @ ensures !\result;
     @ assignable \strictly_nothing;
+    @ assignable<savedHeap> \nothing;
     @*/
   public boolean send(Address sender, Uint256 price) throws Exception {
     // TODO(raul): ask about exceptions, in this method we need to throw an
@@ -119,13 +127,22 @@ public class Address {
     return true;
   }
 
-  /*@ public normal_behavior
-    @ requires<heap><savedHeap> \invariant_for(a);
-    @ ensures<heap><savedHeap> \result == (a.address.length == address.length &&
-    @ 	(\forall int i;0<=i && i < address.length; address[i] == a.address[i]));
-    @ accessible<heap><savedHeap> this.address, this.address[*], a.address, a.address[*];
-    @ assignable<heap><savedHeap> \strictly_nothing;
-    @*/
+   /*@ private normal_behavior
+     @ requires<heap> \invariant_for(a);
+     @ ensures<heap> \result == (a.address.length == address.length &&
+     @ 	(\forall int i;0<=i && i < address.length; address[i] == a.address[i]));
+     @ accessible this.address, this.address[*], a.address, a.address[*];
+     @ accessible<savedHeap> \nothing; 
+     @ assignable<heap><savedHeap> \strictly_nothing;
+     @
+     @ also
+     @
+     @ public normal_behavior
+     @ ensures \result == eq(a);
+     @ accessible this.address, this.address[*], a.address, a.address[*];
+     @ accessible<savedHeap> \nothing; 
+     @ assignable<heap><savedHeap> \strictly_nothing;
+     @*/
   public /*@ strictly_pure @*/ boolean eq(Address a) {
       if (a.address.length != address.length) {
         return false;
@@ -158,28 +175,31 @@ public class Address {
   // `msg.value` to  the contract that has been called by msg.sender.
   /*@ public normal_behavior
     @ requires \invariant_for(msg);
-    @ requires msg.value._value <= this.balance._value;
-    @ requires msg.sender != this;
-    @ ensures this.balance._value == \old(this.balance.sum(msg.value)._value);
-    @ ensures msg.sender.balance._value == \old(msg.sender.balance.sub(msg.value)._value);
+    @ requires msg.value.leq(this.balance);
+    @ requires !msg.sender.eq(this);
+    @ ensures this.balance.eq(\old(this.balance.sum(msg.value)));
+    @ ensures msg.sender.balance.eq(\old(msg.sender.balance.sub(msg.value)));
     @ assignable this.balance, msg.sender.balance;
+    @ assignable<savedHeap> \strictly_nothing;
     @
     @ also
     @
-	@ public normal_behavior
+    @ public normal_behavior
     @ requires \invariant_for(msg);
-    @ requires msg.value._value <= this.balance._value;
-    @ requires msg.sender == this;
-    @ ensures this.balance._value == \old(this.balance._value);
+    @ requires msg.value.leq(this.balance);
+    @ requires msg.sender.eq(this);
+    @ ensures this.balance.eq(\old(this.balance));
     @ assignable this.balance;
+    @ assignable<savedHeap> \strictly_nothing;
     @
     @ also
     @
     @ public exceptional_behavior
     @ requires \invariant_for(msg);
-    @ requires msg.value._value > this.balance._value;
+    @ requires msg.value.gr(this.balance);
     @ signals (Exception) true;
     @ assignable \nothing;
+    @ assignable<savedHeap> \strictly_nothing;
     @*/
   public void payable(Message msg) throws Exception {
     this.transfer(msg.sender, msg.value);

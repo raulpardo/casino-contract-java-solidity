@@ -4,9 +4,9 @@ import blockchain.types.*;
 
 public final class Block {
    //@ public model \locset footprint;
-   //@ public represents footprint = \set_union(this.*, coinbase.footprint);
+   //@ public represents footprint = this.*;
    //@ public accessible \inv: footprint;
-
+   //@ public accessible footprint: footprint;
 	
   /*@ public invariant \invariant_for(coinbase); @*/
   public Address coinbase;     // current block miner’s address

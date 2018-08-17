@@ -8,12 +8,12 @@ public class Logger {
 
   // For now, a trace is a sequence of String where each string represents the
   // state fo the contracts.
-  private ArrayList<String> trace;
-  private ArrayList<Address> addresses; // List of addresses to monitor
+    private ArrayList/*<String>*/ trace;
+    private ArrayList/*<Address>*/ addresses; // List of addresses to monitor
 
   public Logger() {
-    trace = new ArrayList<String>();
-    addresses = new ArrayList<Address>();
+      trace = new ArrayList/*<String>*/();
+      addresses = new ArrayList/*<Address>*/();
   }
 
   public void add(String s) {
