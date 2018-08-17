@@ -372,7 +372,8 @@ public final class Casino extends Address {
           @ requires \invariant_for(_msg) && !_msg.sender.eq(this);
           @ requires \invariant_for(_block) && !_block.coinbase.eq(this);
           @ requires \invariant_for(_tx) && !_tx.origin.eq(this);
-          @ requires state == State.IDLE;
+          @ requires value.gr(Uint256.ZERO) && value.leq(pot);
+          @ requires state == State.IDLE || state == State.GAME_AVAILABLE;
           @ requires _msg.sender.eq(operator);
           @ assignable  pot, msg.sender.balance, this.balance, msg, tx, block, abortCase, \all_objects(<transactionConditionallyUpdated>);
           @ ensures !abortCase ==> pot.eq(\old(pot.sub(value))) &&
