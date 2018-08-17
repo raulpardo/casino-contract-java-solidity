@@ -368,6 +368,7 @@ public final class Casino extends Address {
 
         /*@ public normal_behavior
           @ requires JCSystem.getTransactionDepth() == 0;
+	  @ requires \invariant_for(value);
           @ requires \invariant_for(_msg) && !_msg.sender.eq(this);
           @ requires \invariant_for(_block) && !_block.coinbase.eq(this);
           @ requires \invariant_for(_tx) && !_tx.origin.eq(this);

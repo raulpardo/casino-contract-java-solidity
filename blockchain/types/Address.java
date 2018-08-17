@@ -128,8 +128,8 @@ public class Address {
   }
 
    /*@ private normal_behavior
-     @ requires<heap> \invariant_for(a);
-     @ ensures<heap> \result == (a.address.length == address.length &&
+     @ requires \invariant_for(a);
+     @ ensures \result == (a.address.length == address.length &&
      @ 	(\forall int i;0<=i && i < address.length; address[i] == a.address[i]));
      @ accessible this.address, this.address[*], a.address, a.address[*];
      @ accessible<savedHeap> \nothing; 
