@@ -48,8 +48,9 @@ public class Address {
     @ public exceptional_behavior
     @ requires \invariant_for(price);
     @ requires price.gr(this.balance);
+    @ signals_only Exception;
     @ signals (Exception) true;
-    @ assignable \nothing;
+    @ assignable \strictly_nothing;
     @ assignable<savedHeap> \strictly_nothing;
     @*/
   public void transfer(Address sender, Uint256 price) throws Exception {
@@ -83,7 +84,7 @@ public class Address {
     @ ensures sender.balance.eq(\old(sender.balance.sub(price)));
     @ ensures \result;
     @ assignable this.balance, sender.balance;
-    @ assignable<savedHeap> \nothing;
+    @ assignable<savedHeap> \strictly_nothing;
     @
     @ also
     @
@@ -94,7 +95,7 @@ public class Address {
     @ ensures this.balance.eq(\old(this.balance));
     @ ensures \result;
     @ assignable this.balance;
-    @ assignable<savedHeap> \nothing;
+    @ assignable<savedHeap> \strictly_nothing;
     @
     @ also
     @
@@ -103,7 +104,7 @@ public class Address {
     @ requires price.gr(this.balance);
     @ ensures !\result;
     @ assignable \strictly_nothing;
-    @ assignable<savedHeap> \nothing;
+    @ assignable<savedHeap> \strictly_nothing;
     @*/
   public boolean send(Address sender, Uint256 price) throws Exception {
     // TODO(raul): ask about exceptions, in this method we need to throw an
@@ -166,7 +167,7 @@ public class Address {
   private void throwException() throws Exception { //TransferFailedException {
     // Update: We abort the transaction in the catch statement of original call
     // method
-    throw new Exception();//TransferFailedException();
+    throw casino.contract.Casino.REQUIRES_FAILED;//new TransferFailedException();
   }
 
 
@@ -197,8 +198,9 @@ public class Address {
     @ public exceptional_behavior
     @ requires \invariant_for(msg);
     @ requires msg.value.gr(this.balance);
+    @ signals_only Exception;
     @ signals (Exception) true;
-    @ assignable \nothing;
+    @ assignable \strictly_nothing;
     @ assignable<savedHeap> \strictly_nothing;
     @*/
   public void payable(Message msg) throws Exception {

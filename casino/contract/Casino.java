@@ -11,7 +11,7 @@ import javacard.framework.JCSystem;
 
 public final class Casino extends Address {
 
-        private static final Exception REQUIRES_FAILED = new Exception();
+        public static final Exception REQUIRES_FAILED = new Exception();
 
         // == INVARIANTS ==
 
