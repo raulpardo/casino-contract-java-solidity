@@ -417,6 +417,7 @@ public final class Casino extends Address {
           @ ensures pot.eq(\old(pot.sub(value)));
           @ ensures msg.sender.balance.eq(\old(msg.sender.balance.sum(value)));
           @ ensures this.balance.eq(\old(this.balance.sub(value)));
+	  @ signals_only Exception;
           @ signals (Exception e) true; 
           @ 
           @ also
