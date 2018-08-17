@@ -42,13 +42,14 @@ public final class Casino extends Address {
         // State of the contract
         public static class State { public static final int IDLE = 0, GAME_AVAILABLE = 1, BET_PLACED = 2; }
 
+        /*@ public invariant (state == State.BET_PLACED ? pot.sum(wager.value).eq(this.balance) : pot.eq(this.balance)) &&
+          @                   (state == State.IDLE || state == State.GAME_AVAILABLE || state == State.BET_PLACED);   
+          @*/
         private /*@ spec_public @*/ int /* State */ state;
 
-          /*@ public invariant (state == State.BET_PLACED ? pot.sum(wager.value).eq(this.balance) : pot.eq(this.balance)); @*/
-        /*@ public invariant state == State.IDLE || state == State.GAME_AVAILABLE || state == State.BET_PLACED; @*/
+        
         // Variables
-        //@ public invariant \invariant_for(operator);
-        //@ public invariant operator != this;
+        //@ public invariant \invariant_for(operator) && operator != this && !this.eq(operator);
         public/*@ spec_public @*/ Address operator;     // originally address (20 bytes address)
 
         //@ public invariant \invariant_for(pot);
@@ -61,7 +62,7 @@ public final class Casino extends Address {
         // We use Uint256 for simplicity since we will
         // not verify anything specific to the byte
         // array. TODO: Discuss with others.
-        //@ public invariant \invariant_for(player) && !player.eq(this);
+        //@ public invariant \invariant_for(player) && !player.eq(this) && this != player;
         public /*@ spec_public @*/ Address player;       // originally address
 
         final class Wager {
@@ -722,13 +723,12 @@ public final class Casino extends Address {
           @ requires JCSystem.getTransactionDepth() == 0;
           @ requires \invariant_for(_msg) && !_msg.sender.eq(this);
           @ requires \invariant_for(_block) && !_block.coinbase.eq(this);
-          @ requires \invariant_for(_tx) && !(_tx.origin.eq(this));
+          @ requires \invariant_for(_tx) && !_tx.origin.eq(this);
           @ requires state == State.IDLE;
           @ requires _msg.sender.eq(operator);
           @ assignable balance, operator.balance, destroyed, msg, tx, block, abortCase, \all_objects(<transactionConditionallyUpdated>);
-          @ ensures !abortCase ==> operator.balance.eq(\old(operator.balance.sum(this.balance)));
-          @ ensures !abortCase ==> this.balance.eq(Uint256.ZERO);
-          @ ensures !abortCase ==> destroyed;
+          @ ensures !abortCase ==> ( operator.balance.eq(\old(operator.balance.sum(this.balance))) && 
+	  @                          this.balance.eq(Uint256.ZERO) && destroyed );
           @ ensures  abortCase ==> (\old(balance) == balance && 
           @                        \old(operator.balance) == operator.balance && 
           @                        \old(destroyed) == destroyed);        
