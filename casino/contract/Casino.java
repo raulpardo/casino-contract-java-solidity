@@ -375,13 +375,13 @@ public final class Casino extends Address {
           @ requires value.gr(Uint256.ZERO) && value.leq(pot);
           @ requires state == State.IDLE || state == State.GAME_AVAILABLE;
           @ requires _msg.sender.eq(operator);
-          @ assignable  pot, msg.sender.balance, this.balance, msg, tx, block, abortCase, \all_objects(<transactionConditionallyUpdated>);
+          @ assignable  pot, _msg.sender.balance, this.balance, msg, tx, block, abortCase, \all_objects(<transactionConditionallyUpdated>);
           @ ensures !abortCase ==> pot.eq(\old(pot.sub(value))) &&
-          @                        msg.sender.balance.eq(\old(msg.sender.balance.sum(value))) &&
+          @                        msg.sender.balance.eq(\old(_msg.sender.balance.sum(value))) &&
           @                        this.balance.eq(\old(this.balance.sub(value)));
           @ ensures  abortCase ==> (\old(balance) == balance && 
           @                        \old(pot) == pot && 
-          @                        \old(msg.sender.balance) == msg.sender.balance);        
+          @                        \old(_msg.sender.balance) == _msg.sender.balance);        
           @*/
         public void call_removeFromPot(Uint256 value, Message _msg, Block _block, Transaction _tx) throws Exception {
                 //@ set abortCase = false;
@@ -426,9 +426,10 @@ public final class Casino extends Address {
           @ requires \invariant_for(value);
           @ requires !(operator.eq(msg.sender) &&
           @             value.gr(Uint256.ZERO)  && (state == State.IDLE || state == State.GAME_AVAILABLE));
-          @ signals (Exception) true;
           @ assignable \strictly_nothing;
           @ assignable<savedHeap> \strictly_nothing;
+	  @ signals_only Exception;
+          @ signals (Exception) true;
           @*/
         private void removeFromPot(Uint256 value) throws Exception {
                 // Modifiers
