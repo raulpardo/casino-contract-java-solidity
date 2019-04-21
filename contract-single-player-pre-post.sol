@@ -29,7 +29,7 @@ contract Casino {
   //  * The operator may then submit her original number to resolve the bet
   //  * If the operator has not submitted her number by the timeout (from when the
   //    player placed the bet), the player may ask for a default win
-  //  * If the player has won, he gets to withdraw his wager+that value from the pot
+  //  * If the player has won, he gets to withdraw his wager + the same value from the pot
   //  * If the casino has won, the wager goes to the pot
   //
   // EXPECTED BEHAVIOUR: The operator may not reduce the pot while a bet is active.
@@ -55,11 +55,13 @@ contract Casino {
   
   // The current wager (if any)
   enum Coin { HEADS, TAILS }
+
   struct Wager {
     uint256 value;
     Coin guess;
     uint timestamp;
   }
+
   Wager private wager;
   
   // The state of the contract
@@ -196,9 +198,9 @@ contract Casino {
     
     wager = Wager({
       value: _value,
-	  guess: _guess,
-	  timestamp: now
-	  });
+      guess: _guess,
+      timestamp: now
+    });
     
     // POST: { operator' == operator && timeout' == timeout && pot == pot' &&
     //          (msg.sender != operator && 0 < msg.value <= pot) ==>  wager.value == msg.value && state' == State.BET_PLACED &&
